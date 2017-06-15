@@ -13,11 +13,6 @@ from random import randint
 
 from axiom_db_setup import Base, ArtList, ParaList, EqList
  
-
-### new comment
-
-## two new coments
- 
 filePath = os.getcwd()
 engine = create_engine('sqlite:///'+ filePath + '/axiom.db')
 
