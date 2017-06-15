@@ -1,0 +1,103 @@
+
+
+{% extends "axiom.html" %}
+{% block head %}
+  {{ super() }}
+  <link type="text/css" rel="stylesheet" href={{ url_for('static', filename='styles/article.css') }} />	
+   <script src={{ url_for('static', filename='js/home.js') }} language="Javascript" type="text/javascript"></script>
+   <script src={{ url_for('static', filename='js/article.js') }} language="Javascript" type="text/javascript"></script>
+{% endblock %}
+{% block title %}Ax.home{% endblock %}	
+{% block content %}
+    <div id=content_inner>
+    <div id=para_holder>
+
+
+   	<div class=para id=overview>
+    <div class=section>01: Overview</div>
+   	</div>
+
+    <div class=para>
+
+    Axiom is a wiki platform for technical and mathematical writing. In its current form, it is intended to be a encylopaedia of decision theoretic findings (axioms, representations, etc). The benefit of Axiom over, for instance, Wikipedia is cleaner integration of TeX like rendering and modern web hyper-referencing. 
+   	</div>
+
+   	<div class=para id=basic_editing>
+    <div class=section>02: Basic Editing</div>
+   	</div>
+
+   	<div class=para>
+   	To edit an article, toggle edit mode by clicking the <span class=in>Editing</span> button on the footer of the page. When edit mode is turned on, click on any paragraph to edit it, or add a new paragraph below. When a paragraph is clicked, the editor box will appear in the bottom of the window. Anything typed in the editor will be immediately (locally) rendered in the corresponding paragraph. To commit changes (save to server) click the <span class=in>Commit</span> button. To revert all changes back to the previous commit, click the <span class=in>Undo</span> button. To delete the paragraph entirely, click the <span class=in>Delete</span> button. To add a new, blank paragraph below the current one, click the <span class=in>Add &#x2193</span> button.
+   	</div>
+
+   	<div class=para>
+   	Links to other pages are created by delimiting the title of the article (either the title as displayed on the page, or in the url) between double brackets, so that [[completeness]] automatically renders as <span><a class=hl data-url=completeness href=/completeness>completeness</a><span class=arrow_box ></span></span>. 
+   	</div>
+
+
+   	<div class=para>
+   	Generic TeX syntax is used wherever possible. To create a new section, open a paragraph and include <span class=in>\section{Section Title}</span>. Section numbers will be generated on the fly, and will update automatically if new sections are added out of order. Hovering over the header title displays a table of contents indexed by sections. The table of contents will be auto updated when sections are added. The first section of each article must be "Overview."
+   	</div>
+
+   	<div class=para>
+   	Axiom runs KaTeX for live TeX editing. Generic TeX syntax is used wherever possible. To create a new section, open a paragraph and include <span class=in>\section{Section Title}</span>. To render inline math, delimit TeX markup with <span class=in>$</span>.  That is, <span class=in>$f(x) = x^2$</span> will render as <span class=intromath>f(x) = x^2</span>.
+   	</div>
+
+   	<div class=para>
+   	Display math is delimited by <span class=in>$$</span>: <span class=in>$$\mathbb{E}(f) = \sum_{x \in X}(f)x \pi (x)$$</span> will render as
+   	<div class=eq_wrap><div class='intromath' data-eqtext="\mathbb{E}(f) = \sum_{x \in X} f(x) \pi (x)">\mathbb{E}(f) = \sum_{x \in X} f(x) \pi (x)</div><div class=eq id=expectation>(1)</div></div>
+   	As with section number, equation numbers will be generated and updated automatically.
+   	</div>
+
+   	<div class=para>
+   	KaTex will try to catch errors locally. <span class=in>$f(x) = \tau x  + (1- \tua) y$</span> becomes <span class=intromath>f(x) = \tau x  + (1- \tua) y</span>.
+   	</div>
+
+   	<div class=para id=references>
+    <div class=section>03: References</div>
+   	</div>
+
+   	<div class=para>
+   	Sections and display equations can be hyper-linked in text, both locally and across pages. To form a hyperlink, the target must have a label. To label an equation or section, add a unique alphanumeric label delimited by single brackets. Section two can be labeled as such: <span class=in>\section{Basic Editing}[basic]</span>; equation one can be labeled as such: <span class=in>$$\mathbb{E}(f) = \sum_{x \in X}(f)x \pi (x)$$[expectation]</span>.
+   	</div>
+
+   	<div class=para>
+   	Then, to create a hyperlink, use the <span class=in>\ref</span> comand: <span class=in>\ref{sec:basic}</span> will create a link to the cooresponding section: <a href=#basic_editing>Section 02: Basic Editing</a>. Likewise, <span class=in>\ref{eq:expectation}</span> will render as <span><a class=eq_ref href=/#expectation>(1)</a><span class=arrow_box data-eqtext="\mathbb{E}(f) = \sum_{x \in X} f(x) \pi (x)" data-eqlabel=expectation>...</span></span>. Notice that hovering the mouse over relosolved links will display a popup with the rendered equation.
+   	</div>
+
+   	<div class=para>
+   	Labeled equations from other articles can also be referenced. For example, the first equation in of the article on the <span><a class=hl data-url=completeness href=/completeness>completeness</a><span class=arrow_box ></span></span> axiom is labeled <span class=in>[cax]</span>. To reference, use the <span class=in>*eq</span> reference, calling first the article name and then the equation label, separated by a semicolon and finally and optional link text, delimited by single brakets: <span class=in>\ref{eq*:completeness;cax[the completeness axiom]}</span>, will render <span><a class=eq_ref href=/completeness#cax>the completeness axiom</a><span class=arrow_box data-eqtext="\forall x,y \in X, x \succeq y \text{ or } y \succeq x" data-eqlabel=>...</span></span>. Best practice is to use local links whenever possible to reduce AJAX calls on the server.
+   	</div>
+
+   	<div class=para>
+   	Non-local references without the a declared link text will render a default link text when changes are commited, or when <span class=in>[CMD+R]</span> is pressed. The defualt link text is <span class=in>(article.eq#)</span> so the above link becomes <span><a class=eq_ref href=/completeness#cax>(completeness.1)</a><span class=arrow_box data-eqtext="\forall x,y \in X, x \succeq y \text{ or } y \succeq x" data-eqlabel=>...</span></span>.
+   	</div>
+
+   	<div class=para id=references>
+    <div class=section>04: Popup Overviews</div>
+   	</div>
+
+   	<div class=para>
+   	The first section of each article is titled "Overview." Any paragraphs which are included in the article before the next section title are considered the "Overview" of the article. These introductory paragraphs are indended to give a breif description of the content of the article. Particular attention is paid to this becuase, when hovering on interal links (links to other Axiom pages), a popup will display the overview paragraphs.
+   	</div>
+
+   	<div class=para id=references>
+    <div class=section>05: Keyboard Shortcuts</div>
+   	</div>
+
+
+
+    <div class=para>
+    <a href={{ url_for('Create') }}>Create a new page.</a>
+   	</div>
+    </div>
+    </div>
+     <div id=sidebar><div id=ToC>
+       	<a href=#overview>01: Overview</a><br>
+    	<a href=#basic_editing>02: Basic Editing</a><br>
+    	<a href=#references>03: References</a><br>
+    	<a href=#references>04: Popup Overviews</a><br>
+    	<a href=#references>05: Keyboard Shortcuts</a><br>
+    </div></div>
+{% endblock %}
+{% block header %}<div id='head'>ax.home</div>{% endblock %}

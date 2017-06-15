@@ -1,0 +1,44 @@
+
+input[type=text] {
+    position: fixed;
+    width: 40%;
+    top: 40%;
+    height: 5%;
+    left: 20%;
+    background:lightgray;
+    border:0 none;
+    cursor:text;
+    padding-left: 5%;
+    font-size: 30%;
+}
+
+input[type=submit] {
+    background-color: lightgray; 
+    cursor:pointer;
+    font-family: Inconsolata;
+    font-size: 30%;
+    white-space: normal;
+    -webkit-appearance: none;
+    position: fixed;
+    width: 20%;
+    left: 60%;
+    top: 40%;
+    height: 5%;
+    border: none;
+    border-left: 1px solid black;
+}
+
+input[type=submit]:hover{
+  background-color:  #2D6793;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+#prompt{
+    display: none;
+}
+
+
+

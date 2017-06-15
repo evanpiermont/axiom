@@ -1,0 +1,80 @@
+
+
+{% extends "axiom.html" %}
+{% block head %}
+  {{ super() }}
+  <link type="text/css" rel="stylesheet" href={{ url_for('static', filename='styles/article.css') }} />
+  <script type="text/javascript">
+        var $art_name_url = '{{name_url}}';
+        var $art_id = '{{art.id}}';
+   </script>
+   <script src={{ url_for('static', filename='js/article.js') }} language="Javascript" type="text/javascript"></script>
+{% endblock %}
+{% block title %}Ax.{{art.name}}{% endblock %} 
+{% block content %}
+    <div id=content_inner>
+    <div id=para_holder>
+
+    <div class=wrap id={{art_id ~ "xAwrap"}}>
+      <div id={{art_id ~ "xApara"}} class="para contents" data-norender="\section{Overview}"></div>
+    </div>
+
+     {% for i in para_list %}
+      <div class=wrap id={{i.art_id ~ "x" ~ i.para_order ~ "wrap"}}>
+      <div id={{i.art_id ~ "x" ~ i.para_order ~ "para"}} class="para contents" data-norender="{{i.contents}}"></div>
+      <div id={{i.art_id ~ "x" ~ i.para_order ~ "edit"}} class="parent4focus hidden">
+      <div class=parent4rotate>
+          <form method='POST' enctype='multipart/form-data' class=local_submit action='/_update/{{name_url}}/{{i.para_order}}'>
+              <textarea autocomplete="off" autofocus="autofocus" name={{i.art_id ~ "x" ~ i.para_order ~ "text"}} id={{i.art_id ~ "x" ~ i.para_order ~ "text"}} class="edit_para">
+              </textarea>
+              <div class=button_wrap>
+              <div class='fakebutton' id=commit>Commit</div>
+              <div class='fakebutton' id=discard>Undo</div>
+              <div class='fakebutton' id=add_below>Add &#x2193</div>
+              {%if i.para_order != 0%}
+              <div class='fakebutton deletebutton'>Delete</div>
+              <div class='deleteverify hidden'> Are you sure you would like to delete this section? 
+                <div class='fakebutton' id=delete>Delete</div>
+                <div class='fakebutton' id=undeletebutton>Cancel</div>
+                </div>
+              {% endif%}
+              </div>
+        </form>
+    </div>
+    </div>
+    </div>
+    {% endfor%} 
+
+    <div class=wrap id={{art.id ~ "xrwrap"}}>
+    <div id={{art.id ~ "xrpara"}} class="para contents" data-norender="\section{References}"></div>
+    </div>
+
+    <div class=wrap id={{art_id ~ "xRwrap"}}>
+    <div id={{art.id ~ "xRpara"}} class="para contents refs" data-norender="{{art.cites}}"></div>
+    <div id={{art.id ~ "xRedit"}} class="parent4focus hidden">
+    <div class=parent4rotate>
+          <form method='POST' enctype='multipart/form-data' class=local_submit action='/_update/{{name_url}}/Ref'>
+              <textarea autocomplete="off" autofocus="autofocus" name={{art.id ~ "xRtext"}} id={{art.id ~ "xRtext"}} class="edit_para">
+              </textarea>
+              <div class=button_wrap>
+              <div class='fakebutton' id=commit>Commit</div>
+              <div class='fakebutton' id=discard>Undo</div>
+              </div>
+        </form>
+    </div>
+    </div>
+    </div>
+
+
+    </div>
+    </div>
+
+    <div id=sidebar><div id=ToC></div></form><div id=dl><a href=/_getDL/{{name_url}}>Download</a></div></div>
+
+{% endblock %}
+{% block foot %}
+<span id=editbutton>Editing: Off</span>
+{% endblock %}
+{% block header %}<div id='head'>ax.{{art.name}}</div>{% endblock %}
+
+

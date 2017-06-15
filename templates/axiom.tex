@@ -1,0 +1,66 @@
+\documentclass[paper=a4, fontsize=11pt]{article} % A4 paper and 11pt font size
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm, dsfont} % Math packages
+\usepackage[authoryear]{natbib} %bib
+\usepackage{hyperref} %hyperlinks
+\usepackage{xcolor} %colors
+
+%%%%%
+%%%%% COLORS
+%%%%%
+
+
+\definecolor{linkcolor}{HTML}{ 2D6793}
+
+
+\hypersetup{
+colorlinks=true,
+linkcolor=linkcolor,
+urlcolor=linkcolor,
+citecolor=linkcolor        % color of links to bibliography
+}
+
+%%%%%
+%%%%% SPACING / NUMBERING / TITLES
+%%%%%
+
+
+\usepackage{titlesec}
+\titleformat*{\section}{\large\scshape\centering}
+\titleformat*{\subsection}{\scshape\centering}
+\titleformat*{\subsubsection}{\itshape}
+\titleformat*{\paragraph}{\large\bfseries\centering}
+\titleformat*{\subparagraph}{\large\bfseries\centering}
+
+\titlespacing*\section{0pt}{8pt plus 4pt minus 2pt}{6pt plus 0pt minus 2pt}
+
+%%%%%
+%%%%% ENVIORNMENTS
+%%%%%
+
+\newtheorem{thm}{Theorem}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{lemma}{Lemma}
+\newtheorem{ass}{Assumption}
+\newtheorem{rmk}{Remark}
+\newtheorem*{definition}{Definition}
+\newtheorem*{example}{Example}
+
+
+%%%%%
+%%%%% DOCUMENT
+%%%%%
+
+\begin{document}
+
+\title{Axiom\thanks{This document was created via Axiom. 201pWebDev.}}
+
+\maketitle
+
+
+
+
+\end{document}
+
+

@@ -1,0 +1,16 @@
+
+
+{% extends "axiom.html" %}
+{% block head %}
+  {{ super() }}
+  <link type="text/css" rel="stylesheet" href={{ url_for('static', filename='styles/create.css') }} />
+{% endblock %}
+{% block title %}DTAL{% endblock %}	
+{% block content %}
+	<div id=prompt>To create a new article, type the title and sumbit. If such a page already exists, you will be directed to the existing article.</div>
+    <form method='POST' enctype='multipart/form-data' action='/new_art'>
+    <input type="text" autocomplete="off" autofocus="autofocus"
+    name="new_art" id="new_art_id"><input type="submit" value="Create"
+    class=submit id=submit>
+	</form>
+{% endblock %}

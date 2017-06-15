@@ -1,0 +1,129 @@
+@font-face {
+font-family: 'CM';
+src: url(/static/fonts/lmroman10-regular.otf);
+}
+
+@font-face {
+    font-family: 'CM';
+    src: url("/static/fonts/lmroman10-bold.otf");
+    font-weight: bold;
+}
+@font-face {
+    font-family: 'CM';
+    src: url("/static/fonts/lmroman10-italic.otf");
+    font-style: italic;
+}
+
+@font-face {
+font-family: Inconsolata;
+src: url(/static/fonts/Inconsolata.otf);
+}
+
+body{
+  font-family: CM;
+}
+
+*{
+  padding: 0;
+  margin: 0;
+  -moz-box-sizing: border-box; 
+  -webkit-box-sizing: border-box; 
+  box-sizing: border-box; 
+}
+
+#head{
+  position:fixed;
+  height: 10%;
+  top: 0%;
+  left:0;
+  font-size: 30%;
+  padding-left: 10px;
+  padding-top: 15px;
+  font-family: Inconsolata;
+}
+
+
+document{
+  overflow: hidden;
+}
+
+
+
+#foot{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 20%;
+  padding-left: 3%;
+  height: 50px;
+  padding-top: 15px;
+  border-top: 1px solid black;
+  font-family: Inconsolata;
+}
+
+
+#content{
+  position: relative;
+  margin-top: 10%;
+  margin-bottom: 50%;
+}
+
+#content_inner{
+  position: relative;
+  width: 60%;
+  top: 0%;
+  left: 20%;
+  font-size: 25%;
+  text-align: justify;
+}
+
+.hl{
+  color: #2D6793;
+  text-decoration: none; 
+}
+
+a{
+  color: #2D6793;
+  text-decoration: none; 
+}
+
+.fn_num{
+  color: #2D6793;
+  cursor: pointer;
+}
+
+#ToC > a{
+  color: black;
+  text-decoration: none; 
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
+.para{
+  font-size: 100%;
+  display: block;
+  min-height: 50px;
+  margin-top: 10px;
+  padding: 10px;
+  text-align: justify;
+}
+
+
+#para_holder{
+  margin-top: 40px;
+}
+
+.section{
+  font-size: 150%;
+  text-transform: capitalize;
+}
+
+.in{
+  font-family: Inconsolata;
+}
+
+.err{
+  color: red;
+}

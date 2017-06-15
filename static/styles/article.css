@@ -1,0 +1,255 @@
+
+
+.click2edit{
+  border-left:  white 2px solid;
+}
+
+.click2edit:hover{
+  border-left:  lightgrey 2px solid;
+}
+
+.changed{
+  color: red;
+}
+
+
+
+.edit_para{
+  position: absolute;
+  width: 60%;
+  left: 20%;
+  height: 95%;
+  border: none;
+  background: #e7eaed;
+}
+
+input[type=text] {
+    background:lightgray;
+    border:0 none;
+    -webkit-border-radius: 3px;
+    background: none;
+    margin-bottom: 05px;
+    cursor:text;
+    width: 60%;
+}
+
+input[type=submit] {
+    padding:5px 0px; 
+    background:lightgray; 
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 3px;
+    border-radius: 3px; 
+    background: none;
+    border: 1px solid black; 
+    cursor:pointer;
+    font-family: Inconsolata;
+    font-size: 70%;
+    white-space: normal;
+    -webkit-appearance: none;
+}
+
+input[type=submit]:hover{
+  background-color:  #2D6793;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+textarea { 
+    resize:none;
+    font-size: 120%;
+    font-family: Inconsolata;
+    padding-top: 2%;
+    padding-left: 10px;
+}
+
+.focused{
+  border-left:  red 2px solid;
+}
+
+.focused:hover{
+  border-left:  red 2px solid;
+}
+
+.hidden{
+  display: none;
+}
+
+.err{
+  color: red;
+}
+
+#new_para{ 
+    margin-top: 60px;
+    text-align: center;
+    background: none;
+    border: 2px solid lightgray; 
+    color: lightgrey;
+    font-size: 300%;
+    -webkit-border-radius: 3px;
+    border-radius: 3px; 
+    margin-bottom: 100px;
+    width: 20%;
+    left: 40%;
+}
+
+.click2edit{
+  cursor: pointer;
+}
+
+#editbutton{
+  cursor: pointer;
+  margin-left: 80px;
+}
+
+
+.deleteverify{
+  background-color: lightgray;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+  left: 0;
+  bottom: 50px;
+  height: 30%;
+  font-size: 140%;
+  padding-top:2%;
+  z-index: 9;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.fakebutton{
+    padding:5px 0px; 
+    background:lightgray; 
+    cursor:pointer;
+    -webkit-border-radius: 3px;
+    border-radius: 3px; 
+    background: none;
+    border: 1px solid black; 
+    cursor:pointer;
+    text-align: center;
+    font-size: 70%;
+    width: 50%;
+    margin-bottom: 3%;
+    margin-left: 30%;
+
+}
+
+#undeletebutton{
+    width: 10%;
+    position: absolute;
+    bottom: 10%;
+    left: 5%;
+}
+
+.fakebutton:hover{
+  background-color:  #2D6793;
+}
+
+#delete{
+  position: absolute;
+  width: 10%;
+  bottom: 10%;
+  left: 25%;
+}
+
+.eq{
+  position: absolute;
+  right: 0;
+  top: calc(50% - 1.2em);
+}
+
+.f_eq{
+  position: absolute;
+  right: 0;
+  top: calc(50% - 1.2em);
+}
+
+.eq_wrap{
+  position: relative;
+}
+
+.arrow_box {
+	position: fixed;
+	background: lightgray;
+	border-bottom 2px solid black;
+	min-height: 30px;
+	width: 40%;
+	text-align: center;
+	padding: 5px;
+	border-radius: 3px;
+	display: none;
+}
+.arrow_box:after, .arrow_box:before {
+	top: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_box:after {
+	border-color: rgba(213, 187, 200, 0);
+	border-top-color: lightgray;
+	border-width: 10px;
+	margin-left: -10px;
+
+}
+.arrow_box:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-width: 15px;
+	margin-left: -15px;
+}
+
+.parent4focus{
+	border-top: 3px solid black;
+	background: #e7eaed;
+	position: fixed;
+	bottom: 50px;
+	width: 100%;
+	left: 0;
+	height: 40%;
+	z-index: 999;
+}
+
+.button_wrap{
+	position: absolute;
+	left: 82%;
+	width: 16%;
+	height: 85%;
+	top: 15%;
+	font-family: Inconsolata;
+
+}
+
+#sidebar{
+	position: fixed;
+	padding-top: 40px;
+	padding-left: 10px;
+	width: 20%;
+	min-height: 10%;
+	top: 5%;
+	display: none;
+	font-size: 25%;
+	font-family: Inconsolata;
+}
+
+#dl{
+	padding-top: 10%;
+	padding-bottom: 20%;
+	cursor: pointer;
+}
+
+.thm_num{
+	font-weight: bold;
+	font-style: normal;
+}
+
+.thm{
+	font-style: italic; 
+}
