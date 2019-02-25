@@ -1,6 +1,5 @@
 click==6.7
 Flask==1.0.2
-alpha-vantage==2.1.0
 requests==2.19.1
 gunicorn==19.8.1
 itsdangerous==0.24

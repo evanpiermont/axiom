@@ -1,1 +1,1 @@
-web: gunicorn options:app
+web: gunicorn axiom:app
