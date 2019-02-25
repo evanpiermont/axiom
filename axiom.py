@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 import os, re, datetime, time, json
 from os import curdir, sep
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -392,75 +392,75 @@ def getDL(art_id):
 
     #render_template('axiom.tex')
 
-    tex = """\documentclass[paper=a4, fontsize=11pt]{article} %% A4 paper and 11pt font size
-\usepackage[english]{babel} % English language/hyphenation
-\usepackage{amsmath,amsfonts,amsthm, dsfont} %% Math packages
-\usepackage{filecontents}
-\usepackage{hyperref} %% hyperlinks
-\usepackage{xcolor} %% colors
+#     tex = """\documentclass[paper=a4, fontsize=11pt]{article} %% A4 paper and 11pt font size
+# \usepackage[english]{babel} % English language/hyphenation
+# \usepackage{amsmath,amsfonts,amsthm, dsfont} %% Math packages
+# \usepackage{filecontents}
+# \usepackage{hyperref} %% hyperlinks
+# \usepackage{xcolor} %% colors
 
-%%%%
-%%%% COLORS
-%%%%
-
-
-\definecolor{linkcolor}{HTML}{ 2D6793}
+# %%%%
+# %%%% COLORS
+# %%%%
 
 
-\hypersetup{
-colorlinks=true,
-linkcolor=linkcolor,
-urlcolor=linkcolor,
-citecolor=linkcolor        % color of links to bibliography
-}
-
-%%%%
-%%%% SPACING / NUMBERING / TITLES
-%%%%
+# \definecolor{linkcolor}{HTML}{ 2D6793}
 
 
-\usepackage{titlesec}
-\\titleformat*{\section}{\large\scshape\centering}
-\\titleformat*{\subsection}{\scshape\centering}
-\\titleformat*{\subsubsection}{\itshape}
-\\titleformat*{\paragraph}{\large\\bfseries\centering}
-\\titleformat*{\subparagraph}{\large\\bfseries\centering}
+# \hypersetup{
+# colorlinks=true,
+# linkcolor=linkcolor,
+# urlcolor=linkcolor,
+# citecolor=linkcolor        % color of links to bibliography
+# }
 
-\\titlespacing*\section{0pt}{8pt plus 4pt minus 2pt}{6pt plus 0pt minus 2pt}
+# %%%%
+# %%%% SPACING / NUMBERING / TITLES
+# %%%%
 
-%%%%
-%%%% ENVIORNMENTS
-%%%%
 
-\\newtheorem{thm}{Theorem}
-\\newtheorem{prop}[thm]{Proposition}
-\\newtheorem{cor}{Corollary}[thm]
-\\newtheorem{lemma}{Lemma}
-\\newtheorem{ass}{Assumption}
-\\newtheorem{rmk}{Remark}
-\\newtheorem*{definition}{Definition}
-\\newtheorem*{example}{Example}
+# \usepackage{titlesec}
+# \\titleformat*{\section}{\large\scshape\centering}
+# \\titleformat*{\subsection}{\scshape\centering}
+# \\titleformat*{\subsubsection}{\itshape}
+# \\titleformat*{\paragraph}{\large\\bfseries\centering}
+# \\titleformat*{\subparagraph}{\large\\bfseries\centering}
 
-%%%%
-%%%% LOCAL BIB
-%%%%
+# \\titlespacing*\section{0pt}{8pt plus 4pt minus 2pt}{6pt plus 0pt minus 2pt}
 
-\\begin{filecontents}{localbib.bib} \n"""
+# %%%%
+# %%%% ENVIORNMENTS
+# %%%%
+
+# \\newtheorem{thm}{Theorem}
+# \\newtheorem{prop}[thm]{Proposition}
+# \\newtheorem{cor}{Corollary}[thm]
+# \\newtheorem{lemma}{Lemma}
+# \\newtheorem{ass}{Assumption}
+# \\newtheorem{rmk}{Remark}
+# \\newtheorem*{definition}{Definition}
+# \\newtheorem*{example}{Example}
+
+# %%%%
+# %%%% LOCAL BIB
+# %%%%
+
+# \\begin{filecontents}{localbib.bib} \n"""
             
-    tex += q.cites
+#     tex += q.cites
 
-    tex += """\n \\end{filecontents}
+#     tex += """\n \\end{filecontents}
 
-\\usepackage{natbib}
+# \\usepackage{natbib}
 
 
-%%%%
-%%%% DOCUMENT
-%%%%
+# %%%%
+# %%%% DOCUMENT
+# %%%%
 
-\\begin{document}
+# \\begin{document}
     
-        """
+#         """
 
     tex += '''\n \n \n \\title{{ {0}\\thanks{{This document was created via Axiom. 201pWebDev.}} \\date{{{1}}} }}\\maketitle \n \n \section{{Overview}}\label{{sec:overview}} \n \n'''.format(art_id.title(), datetime.datetime.now())
 
