@@ -6,7 +6,7 @@
 
 
 $cBG = "white";
-$cHBG = "lightgray";
+$cHBG = "#ECECEC";
 $cHT = "#4a0000";
 
 

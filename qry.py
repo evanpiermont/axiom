@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 import os
 import datetime, time
-from axiom_db_setup import Base, ArtList, ParaList, EqList
+from axiom_db_setup import Base, ArtList, ParaList, EqList, BibList
  
  
 filePath = os.getcwd()
@@ -26,18 +26,12 @@ DBSession = sessionmaker(bind=engine)
 # session.rollback()
 session = DBSession()
 
-art_name_url = 'completeness'
 
-q = session.query(ArtList).filter(ArtList.name_url==art_name_url)
+q =  session.query(BibList).all()
 
-for i in q:
-	print "-----"
-	print i.cites
+for cite in q:
+    print(cite.cite_text)
 
-
-
-
-print "done."
 
 
 

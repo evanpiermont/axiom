@@ -10,43 +10,59 @@ var newparaAllowed = true
 
 // Finds $ signs and replaces with the necesary <span> then calls KATEX render.
 
-  renderPara = function(id){
-        var unRendered = $(id).data("norender");
-        var Rendered = unRendered.replace(/\$(.*?)\$/g, function myFunction(x){
-            var nodollar = x.substring(1, x.length-1);
-            return "<span class=math>" + nodollar + "</span>"
-            });
-        $(id).html(Rendered) 
-        renderKatex()
-  };
+  // renderPara = function(id){
+  //       var unRendered = $(id).data("norender");
+  //       var Rendered = unRendered.replace(/\$(.*?)\$/g, function myFunction(x){
+  //           var nodollar = x.substring(1, x.length-1);
+  //           return "<span class=math>" + nodollar + "</span>"
+  //           });
+  //       $(id).html(Rendered) 
+  //       renderKatex()
+  //};
 
  // The defult is to have edit boxes hidden. showEditBox will show the current box when clicked. 
 
-var currentE = 0
+var currentE = "0"
 
 showEditBox = function(x){
 
   if (editmode) {
          $('.click2edit').removeClass('focused');
+         $('.para').show()
          if (currentE != x){
+        //commit changes
+         var current_id = currentE.substring(0, currentE.length-4);
+         //console.log(para, val)
+         comBut = $('#' + current_id+ "wrap").find('#commit');
+         if (comBut.hasClass('changed')){
+            val = $('#' + current_id+ "edit").find('.edit_para').val()
+            para = $('#' + current_id+ "para").data('norender', val);
+            renderPara('#' + current_id+ "para")
+            comBut.click();
+        };
          currentE = x;
-         var y = x.substring(0, x.length-4) + "edit"
-         var z = x.substring(0, x.length-4) + "text"
+         paraId = x.substring(0, x.length-4);
+         var y = paraId + "edit"
+         var z = paraId + "text"
          $('#' + x).addClass('focused');
          var paraContent = $('#' + x).data('norender');
          $('.parent4focus').hide(0, function() {
+                $('#' + x).hide();
                 $('#' + y).show();
                 $('#' + z).val(paraContent);
+                textAreaResize();
                 location.href = "#"+x;
                 $('#' + z).focus();
                 
         });
-         } else {
-           $('.parent4focus').hide();
-           $('.deleteverify').addClass('hidden')
-           currentE = 0;
-         }
-  }
+        
+         // } else {
+         //   $('.parent4focus').hide();
+         //   $('.deleteverify').addClass('hidden')
+         //   currentE = "0";
+         // };
+        };
+      };
  };
 
 
@@ -54,6 +70,24 @@ showEditBoxOnClick = function(){
     $(document).on('click', '.click2edit', function(){
          var x = $(this).attr('id');
          showEditBox(x)
+     });
+    $(document).on('click', '#content', function(){
+
+        if(event.target.id=="content"){ 
+        var current_id = currentE.substring(0, currentE.length-4);
+        comBut = $('#' + current_id+ "wrap").find('#commit');
+         if (comBut.hasClass('changed')){
+            val = $('#' + current_id+ "edit").find('.edit_para').val()
+            para = $('#' + current_id+ "para").data('norender', val);
+            renderPara('#' + current_id+ "para")
+            comBut.click();
+        };
+        $('.click2edit').removeClass('focused');
+        $('.para').show()      
+        $('.parent4focus').hide();
+        $('.deleteverify').addClass('hidden')
+        currentE = "0";
+       };
      });
  };
 
@@ -68,19 +102,31 @@ $(document).ready(showEditBoxOnClick);
      $(document).on('keyup', '.edit_para', function(){
         var z = $(this).attr('id');
         var x = z.substring(0, z.length-4) + "para"
-        var value = $(this).val();
-        $('#' + x).data('norender', value);
-        if($('#' + x).hasClass('refs')){
-          renderCite('#' + x);
-        } else {
-          renderPara('#' + x);
-        }
+        // var value = $(this).val();
+        // $('#' + x).data('norender', value);
+        // if($('#' + x).hasClass('refs')){
+        //   renderCite('#' + x);
+        // } else {
+        //   renderPara('#' + x);
+        // }
         $('#' + z).siblings('.button_wrap').find('#commit').addClass('changed');
      })
  };
 
-$(document).ready(localChangeText);
+ textAreaResize = function(){
+  $('textarea').each(function () {
+  this.setAttribute('style', 'height:' + (parseInt((this.scrollHeight)) + 0) + 'px;overflow-y:hidden;');
+  });
+  
+  $(document).on('input', 'textarea', function () {
+  this.style.height = 'auto';
+  this.style.height = (this.scrollHeight) + 'px';
+  //scrollBottom()
+});
+};
 
+$(document).ready(localChangeText);
+$(document).ready(textAreaResize);
 
 
 
@@ -89,9 +135,10 @@ $(document).ready(localChangeText);
 // Update this to make more sophisticated
 
 renderKatex = function($id){
-  $($id + ' .math').each(function() {
+  $($id).find('.math').each(function() {
     var texTxt = $(this).text();
     el = $(this).get(0);
+    //console.log(el, 'katex')
     try {
       if(this.tagName == 'DIV'){
         katex.render(texTxt, el, { displayMode: true, throwOnError: false});
@@ -116,22 +163,34 @@ renderPara = function(id, pop){
         var texcode = unRendered;
         var sec = false;
         var thm = false;
+        var ex = false;
+        var cap = false;
         var eq_num = false;
         var f_eq_num = false;
         var eq_ref = false;
         var sec_ref = false;
         var fn_num = false;
         var thm_ref = false;
+        var ex_ref = false;
         var cite_ref = false;
-        var Rendered = unRendered.replace(/(\\footnote\{)(.*?)\}/g, function myFunction(x){
+        var Rendered = ""
+        Rendered += unRendered
+        //escape chars
+        Rendered = Rendered.replace(/\\\$/g, `&#36;`);
+        Rendered = Rendered.replace(/\\\{/g, `&#123;`);
+        Rendered = Rendered.replace(/\\\}/g, `&#125;`);
+        //footnotes
+        Rendered = Rendered.replace(/(\\footnote\{)(.*?)\}/g, function myFunction(x){
             var fntext = x.substring(10, x.length-1);
             fn_num = true;
             return `<span><span class=fn_num><sup></sup></span><span class=arrow_box data-fntext='`+fntext+`'></span></span>`;
             });
+        //link to different page, using [[brackets with name of page]]
         Rendered = Rendered.replace(/\[\[(.*?)\]\]/g, function myFunction(x){
             var nobrak = x.substring(2, x.length-2);
             var url = nobrak.replace(/[^\w\s]/g, '');
             url = url.replace(/\s+/g, '-').toLowerCase();
+            texcode = texcode.replace(x, '\\href{' + window.location.origin + '/' + url +'}{' + nobrak + '}')
             if (pop) { //in popup, do not have links create new popups
             return '<span><a data-url='+url+' href=/' + url + '>' + nobrak + "</a><span class=arrow_box >...</span></span>"
             } else{
@@ -163,21 +222,6 @@ renderPara = function(id, pop){
             var nodollar = x.substring(1, x.length-1);
             return "<span class=math>" + nodollar + "</span>"
             });
-         Rendered = Rendered.replace(/(\\section\{)(.*?)\}(?:\[(.*?)\])?/g, function myFunction(x){
-            var re = /(\[(.*?)\])/
-            var seclabel = x.match(re)
-            if (seclabel) {
-              var realseclabel = seclabel[1].slice(1,-1);
-              var labellen = realseclabel.length + 2;
-            }else{
-              var labellen = 0;
-              var realseclabel = '';
-            }
-            var nodollar = x.substring(9, x.length- labellen - 1);
-            sec = true;
-            texcode = texcode.replace(x, '\\section{'+nodollar+'} \n \\label{sec:'+realseclabel+'}');
-            return "<div class=section id ="+realseclabel+"><span class=section_num></span>" + nodollar + "</div>";
-            });
           Rendered = Rendered.replace(/(\\ref\{eq\:)(.*?)\}/g, function myFunction(x){
             var eqlabel = '#' + x.substring(8, x.length-1);
             eq_ref = true;
@@ -208,37 +252,128 @@ renderPara = function(id, pop){
             texcode = texcode.replace(x, 'Section \\ref{sec:' + seclabel.slice(-1) + '}');
             return '<a class=sec_ref href=/'+$art_name_url+seclabel+' data-seclabel='+seclabel+'>(??)</a>'
             });
-          Rendered = Rendered.replace(/(\\theorem\{)(.*?)\}(?:\[(.*?)\])?/g, function myFunction(x){
-            var re = /(\[(.*?)\])/
-            var thmlabel = x.match(re)
-            if (thmlabel) {
-              var realthmlabel = thmlabel[1].slice(1,-1);
-              var labellen = realthmlabel.length + 2;
-            }else{
-              var labellen = 0;
-              var realthmlabel = '';
-            }
-            var nodollar = x.substring(9, x.length- labellen - 1);
-            thm = true;
-            texcode = texcode.replace(x, '\\begin{thm}\\label{thm:'+realthmlabel+'} \n '+ nodollar + '\n \\end{thm}');
-            return "<span class=thm id ="+realthmlabel+"><span class=thm_num></span>" + nodollar + "</span>";
-            });
-          Rendered = Rendered.replace(/(\\ref\{thm\:)(.*?)\}/g, function myFunction(x){
-            var thmlabel = '#' + x.substring(9, x.length-1);
+         Rendered = Rendered.replace(/(\\ref\{thm\:)(.*?)\}/g, function myFunction(x){
+            var envlabel = '#' + x.substring(9, x.length-1);
             thm_ref = true;
-            texcode = texcode.replace(x, 'Theorem \\ref{thm:' + thmlabel.slice(-1) + '}');
-            return '<a class=thm_ref href=/'+$art_name_url+thmlabel+' data-thmlabel='+thmlabel+'>(??)</a>'
+            texcode = texcode.replace(x, 'Theorem \\ref{thm:' + envlabel.slice(-1) + '}');
+            return '<a class=thm_ref href=/'+$art_name_url+envlabel+' data-envlabel='+envlabel+'>(??)</a>'
             });
+          Rendered = Rendered.replace(/(\\ref\{ex\:)(.*?)\}/g, function myFunction(x){
+            var envlabel = '#' + x.substring(8, x.length-1);
+            ex_ref = true;
+            texcode = texcode.replace(x, 'Example \\ref{ex:' + envlabel.slice(-1) + '}');
+            return '<a class=ex_ref href=/'+$art_name_url+envlabel+' data-envlabel='+envlabel+'>(??)</a>'
+            }); 
           Rendered = Rendered.replace(/(\\cite\{)(.*?)\}/g, function myFunction(x){
-            var citekey = '#cite' + x.substring(6, x.length-1);
+            var citekey = x.substring(6, x.length-1);
             cite_ref = true;
-            texcode = texcode.replace(x, '\\cite{' + citekey.slice(5) + '}');
+            texcode = texcode.replace(x, '\\cite{' + citekey + '}');
+            keylist = citekey.split(",")
+            citehtml = ""
+            for (i = 0; i < keylist.length; i++) {
+                 if(i==0){
+                 citehtml += '<span><a class=cite_ref href=/'+$art_name_url+'#cite'+keylist[i]+' data-citekey='+keylist[i]+'>??</a><span class=arrow_box>...</span></span>';
+                 } else {
+                 citehtml += '; <span><a class=cite_ref href=/'+$art_name_url+'#cite'+keylist[i]+' data-citekey='+keylist[i]+'>??</a><span class=arrow_box>...</span></span>';                  
+                }
+             } 
             if (pop){
-            return '<span>[cite:'+citekey.slice(5)+']</span>'
+            return citehtml
             } else {
-            return '<span><a class=cite_ref href=/'+$art_name_url+citekey+' data-citekey='+citekey+'>(??)</a><span class=arrow_box>...</span></span>'
+            return citehtml
+            }
+            });  
+            Rendered = Rendered.replace(/(\\citep\{)(.*?)\}/g, function myFunction(x){
+            var citekey = x.substring(7, x.length-1);
+            cite_ref = true;
+            texcode = texcode.replace(x, '\\cite{' + citekey + '}');
+            keylist = citekey.split(",")
+            citehtml = "("
+            for (i = 0; i < keylist.length; i++) {
+                 if(i==0){
+                 citehtml += '<span><a class="cite_ref paren" href=/'+$art_name_url+'#cite'+keylist[i]+' data-citekey='+keylist[i]+'>??</a><span class=arrow_box>...</span></span>';
+                 } else {
+                 citehtml += '; <span><a class="cite_ref paren" href=/'+$art_name_url+'#cite'+keylist[i]+' data-citekey='+keylist[i]+'>??</a><span class=arrow_box>...</span></span>';                  
+                }
+             } 
+            citehtml += ")"
+            if (pop){
+            return citehtml
+            } else {
+            return citehtml
+            }
+            }); 
+         Rendered = Rendered.replace(/(\\textcolor\{)(.*?)\}(?:\{(.*?)\})?/g, function myFunction(x){
+            var re = /(\{(.*?)\})/g
+            var color = x.match(re)
+            if(color.length == 2){
+              col = color[0].slice(1,-1)
+              ctext = color[1].slice(1,-1)
+              if(col[0]=="#"){
+                texcode = texcode.replace(x, '\\definecolor{'+col.slice(1)+'}{HTML}{'+col.slice(1)+'} \n \\textcolor{'+col.slice(1)+'}{'+ctext+'}');
+              }else{
+              texcode = texcode.replace(x, '\\textcolor{'+col+'}{'+ctext+'}');
+              };
+            return `<span style="color:`+ col + `">` + ctext + "</span>";
             }
             });
+         // for enviornments
+        if(Rendered.startsWith("\\example")){
+            var re1 = /(\\example)(?:\[(.*?)\])?/g //get \\section[label]
+            x = Rendered.match(re1)[0]
+            realenvlabel = envLableText(x,Rendered).realenvlabel
+            inner_text = envLableText(x,Rendered).inner_text
+            ex = true;
+            ex_ref = true;
+            texcode = '\\begin{ex}\\label{ex:'+realenvlabel+'} \n '+ inner_text + '\n \\end{ex}';
+            Rendered = "<span class=ex id ="+realenvlabel+"><span class=ex_num></span>" + inner_text + "</span>";
+
+        };
+        if(Rendered.startsWith("\\section")){
+            var re1 = /(\\section)(?:\[(.*?)\])?/g //get \\section[label]
+            x = Rendered.match(re1)[0]
+            realenvlabel = envLableText(x,Rendered).realenvlabel
+            inner_text = envLableText(x,Rendered).inner_text
+            sec = true;
+            texcode = '\\section{'+inner_text+'} \n \\label{sec:'+realenvlabel+'}';
+            Rendered = "<div class=section id ="+realenvlabel+"><span class=section_num></span>" + inner_text + "</div>";
+        }
+        if(Rendered.startsWith("\\theorem")){
+            var re1 = /(\\theorem)(?:\[(.*?)\])?/g //get \\section[label]
+            x = Rendered.match(re1)[0]
+            realenvlabel = envLableText(x,Rendered).realenvlabel
+            inner_text = envLableText(x,Rendered).inner_text
+            thm = true;
+            thm_ref = true
+            texcode = '\\begin{thm}\\label{thm:'+realenvlabel+'} \n '+ inner_text + '\n \\end{thm}';
+            Rendered =  "<span class=thm id ="+realenvlabel+"><span class=thm_num></span>" + inner_text + "</span>";
+        };
+        if(Rendered.startsWith("\\proof")){
+            var re1 = /(\\proof)(?:\[(.*?)\])?/g //get \\section[label]
+            x = Rendered.match(re1)[0]
+            realenvlabel = envLableText(x,Rendered).realenvlabel
+            inner_text = envLableText(x,Rendered).inner_text
+            texcode = '\\begin{proof}\\label{proof:'+realenvlabel+'} \n '+ inner_text + '\n \\end{proof}';
+            Rendered =  "<span class=proof id ="+realenvlabel+">Proof. </span>" + inner_text + "<div class='qed'>&#9632;</div>";
+        };
+        if(Rendered.startsWith("\\img")){
+            var re1 = /(\\img)(?:\[(.*?)\])?/g //get \\section[label]
+            x = Rendered.match(re1)[0]
+            url = envLableText(x,Rendered).realenvlabel
+            caption = envLableText(x,Rendered).inner_text.trim()
+            if(caption.startsWith("\\caption")){
+              var re1 = /(\\caption)(?:\[(.*?)\])?/g //get \\section[label]
+              x = Rendered.match(re1)[0]
+              realenvlabel = envLableText(x,caption).realenvlabel
+              caption_text = envLableText(x,caption).inner_text
+              cap = true
+              texcode = "%%% IMG NOT AVAIBLE USE CONTEX";
+              Rendered =  "<img class=img_center src="+url+"><div class=caption id="+realenvlabel+"><span class=cap_num></span>" + caption_text + "</div>";
+            } else {
+              texcode = "%%% IMG NOT AVAIBLE USE CONTEX";
+              Rendered =  "<img class=img_center src="+url+">";
+            };
+        };
         $(id).html(Rendered)
         $(id).data('texcode', texcode)
         eq_dict = {};
@@ -267,12 +402,25 @@ renderPara = function(id, pop){
           thms();
           thm = false;
         }
+        if (ex){
+          exs();
+          ex = false;
+        }
+        if (cap){
+          caps();
+          cap = false;
+        }
         if (thm_ref){
           thm_refs();
           thm_ref = false;
         }
+        if (ex_ref){
+          ex_refs();
+          ex_ref = false;
+        }
         if (cite_ref){
           cite_refs();
+          render_refs();
           cite_ref = false;
         }
 
@@ -284,7 +432,27 @@ renderPara = function(id, pop){
         renderKatex(id)
   };
 
-  
+envLableText = function(x, y){
+  //x is a \\enviorment[lable] regex capture
+  //y is the entire text
+  var re = /(\[(.*?)\])/
+  var envlabel = x.match(re)
+  if (envlabel) {
+    var realenvlabel = envlabel[1].slice(1,-1);
+    var labellen = realenvlabel.length + 2;
+  }else{
+    var labellen = 0;
+    var realenvlabel = '';
+  }
+  inner_text = y.slice(x.length)
+  if(inner_text[0] == " "){
+    inner_text = inner_text.slice(1);
+  }
+  return {
+        inner_text: inner_text,
+        realenvlabel: realenvlabel,
+    };
+};
 
 makeNewPara = function($para_id, $para_order, $prev_para){
        $($prev_para).after(`
@@ -319,7 +487,7 @@ makeNewPara = function($para_id, $para_order, $prev_para){
 
 
 renderAll = function(){ 
-  $('.contents').each(function() {
+  $('.para').each(function() {
   var x = $(this).attr('id');
   renderPara('#' + x)
   if($('#' + x).hasClass('refs')){
@@ -327,7 +495,7 @@ renderAll = function(){
   }
   });
   foreign_eq_refs();
-  cite_refs();
+  render_refs();
  };
 
  $(document).ready(renderAll)
@@ -336,12 +504,12 @@ renderAll = function(){
 
 function serverChanges($form, formdata){
         $.post($form.attr('action'), formdata, function(json){
-            console.log(json);
+            //console.log(json);
             var z = json.para.substring(0, json.para.length-4) + "text";
             $('#' + z).val(json.para_contents);
             $('#' + json.para).data('norender', json.para_contents);
             $('#' + z).siblings('.button_wrap').find('#commit').removeClass('changed');
-            renderPara('#' + json.para);
+            //renderPara('#' + json.para);
               if($('#' + json.para).hasClass('refs')){
                 renderCite('#' + json.para);
               }
@@ -354,8 +522,8 @@ $(document).ready(function(){
       var $form = $(this).closest(".local_submit");
         var formdata = $form.serialize();
         formdata = formdata + '&submit=commit';
-        var texcode = JSON.stringify($(this).closest('.wrap').find('.para').data('texcode'));
-        console.log(texcode)
+        para = $(this).closest('.wrap').find('.para')
+        var texcode = JSON.stringify(para.data('texcode'));
         formdata =formdata + '&texcode=' + texcode;
         var eq = JSON.stringify($('#content').data('eq'));
         formdata = formdata + '&eq=' + eq;
@@ -366,6 +534,7 @@ $(document).ready(function(){
         formdata = formdata + '&issec=' + false;
         }
         serverChanges($form, formdata);
+        renderPara(para.attr('id'))
         foreign_eq_refs();
       return false;
   });
@@ -381,18 +550,17 @@ $(document).ready(function(){
         var formdata = $form.serialize();
         formdata = formdata + '&submit=add_below'; 
         $.post($form.attr('action'), formdata, function(json){
-          console.log(json);
           var v = '#' + json.prev_para + "wrap";
           makeNewPara(json.new_para, json.para_order, v);
         }, 'json');
       return false;
    });
-  $(document).on('click', '#delete', function(){
+  $(document).on('click', '#del', function(){
         var $form = $(this).closest(".local_submit");
         var formdata = $form.serialize();
         formdata = formdata + '&submit=delete'; ; 
         $.post($form.attr('action'), formdata, function(json){
-            console.log(json)
+            console.log('cc', json)
             var u = json.para.substring(0, json.para.length-4) + "wrap";
             $('#' + u).remove();
             sections();
@@ -419,11 +587,27 @@ sections = function(){
 
 thms = function(){
   var thm = 1
-  thm += '0' + thm
-  thm = thm.slice(-2);
+  //thm += '0' + thm
+  //thm = thm.slice(-2);
   $('.thm').each(function() {
   $(this).children('.thm_num').text("Theorem "+thm+". ");
   thm += 1;
+  });
+};
+
+caps = function(){
+  var cap = 1
+  $('.caption').each(function() {
+  $(this).children('.cap_num').text("Figure "+cap+". ");
+  cap += 1;
+  });
+};
+
+exs = function(){
+  var ex = 1
+  $('.ex').each(function() {
+  $(this).children('.ex_num').text("Example "+ex+". ");
+  ex += 1;
   });
 };
 
@@ -505,27 +689,62 @@ sec_refs = function(){
 };
 
 cite_refs = function(){
+  keylist = []
   $('.cite_ref').each(function() {
-  var citekey = $(this).data("citekey");
-  var citelable = $(citekey).find('.cite_num').text();
-  var citetext = $(citekey).text();
-  if (citelable){
-      $(this).text(citelable).removeClass('err');
-      $(this).siblings('.arrow_box').text(citetext);
-  } else {
-      $(this).text('(??)').addClass('err');
-  }
+  el = $(this)
+  current_key = el.data("citekey")
+  keylist.push(current_key);
   });
+  keylist = JSON.stringify(keylist);
+  $.getJSON('/_getREFS', {
+          keylist: keylist,
+        }, function(json) {
+          //console.log(json)
+          keydict = json['json_key_list']
+          keydict = JSON.parse(keydict)
+          ref_html = ""
+          for(citekey in keydict){
+            if(keydict[citekey]){
+            ref_html += `<div class=cite id=cite`+citekey+`><span class=cite_num></span>` +
+              keydict[citekey]['author'] +'. ' + keydict[citekey]['year']  +'. ' +  keydict[citekey]['title'] +'.  <em>' + keydict[citekey]['journal'] + '</em>' + keydict[citekey]['volume'] + keydict[citekey]['number'] + keydict[citekey]['pages'] +'.'
+            + `</div>`
+          };
+          };
+          $('#xrpara').html(ref_html)
+          sortCite('#xrpara')
+          //cite_nums() no need for numbers
+          $('#xRwrap').fadeIn();
+        });
 };
 
+render_refs = function(){
+  $('.cite_ref').each(function() {
+  el = $(this)
+  render_refs_local(el);
+    });
+};
+
+
+render_refs_local = function(el){
+  current_key = el.data("citekey")
+  $.getJSON('/_getCITETEXT', {
+          current_key: current_key,
+        }, function(json) {
+          if(json){
+            if (el.hasClass('paren')){
+              el.text(json.cite_text + ', ' + json.year);
+            } else {
+            el.text(json.cite_text + ' (' + json.year + ")");
+            };
+          };
+        });
+    };
 
 
 thm_refs = function(){
   $('.thm_ref').each(function() {
-  var thmlabel = $(this).data("thmlabel");
-  var thmname = $(thmlabel).children('.thm_num').text();
-    console.log(thmname);
-
+  var envlabel = $(this).data("envlabel");
+  var thmname = $(envlabel).children('.thm_num').text();
   if (thmname){
       $(this).text(thmname.slice(0, -2))
   } else {
@@ -533,6 +752,20 @@ thm_refs = function(){
   }
   });
 };
+
+
+ex_refs = function(){
+  $('.ex_ref').each(function() {
+  var envlabel = $(this).data("envlabel");
+  var exname = $(envlabel).children('.ex_num').text();
+  if (exname){
+      $(this).text(exname.slice(0, -2))
+  } else {
+      $(this).text('(??)').addClass('err');
+  }
+  });
+};
+
 
 //fn_nums numbers
 
@@ -684,6 +917,10 @@ ov_popup = function(){
             preRenderPop('#' + foreign_art_id + '_popup' + i, foreign_art_id);
             renderPara('#' + foreign_art_id + '_popup' + i, true);
             foreign_eq_refs();
+            $('#' + foreign_art_id + '_popup' + i).find('.cite_ref').each(function() {
+            elCite = $(this)
+            render_refs_local(elCite);
+            });
             }
             var z = el.siblings('.arrow_box').width();
             var v = el.siblings('.arrow_box').height();
@@ -704,6 +941,7 @@ ov_popup = function(){
      $(document).on('mouseenter', '.cite_ref', function(){
       var el = $(this).siblings('.arrow_box').get(0);
       var stupidel = $(this)
+      citekey = $(this).data('citekey')
       stupidel.siblings('.arrow_box').width('50%')
       window.onmousemove = function (e) {
           var z = stupidel.siblings('.arrow_box').width();
@@ -713,7 +951,10 @@ ov_popup = function(){
           el.style.top = (mouseY - v - 30) + 'px';
           el.style.left = (mouseX - z/2) + 'px';
         };
-       $(this).siblings('.arrow_box').fadeIn();
+       box = $(this).siblings('.arrow_box')
+       box.html($('#cite' + citekey).html())
+       box.fadeIn();
+
     });
     $(document).on('mouseleave', '.cite_ref', function(){
        $(this).siblings('.arrow_box').hide();
@@ -769,17 +1010,17 @@ clickforEditMode = function(){
 
 $(document).ready(clickforEditMode)
 
-toggleDelete = function(){
-   $(document).on('click', '.deletebutton', function(){
-    $(this).siblings('.deleteverify').removeClass('hidden')
-});
-  $(document).on('click', '.undeletebutton', function(){
-    $(this).parents('.deleteverify').addClass('hidden')
-});
-};
+// toggleDelete = function(){
+//    $(document).on('click', '.deletebutton', function(){
+//     $(this).siblings('.deleteverify').removeClass('hidden')
+// });
+//   $(document).on('click', '.undeletebutton', function(){
+//     $(this).parents('.deleteverify').addClass('hidden')
+// });
+// };
 
 
-$(document).ready(toggleDelete)
+// $(document).ready(toggleDelete)
 
 window.addEventListener("hashchange", function () {
     window.scrollTo(window.scrollX, window.scrollY - 50);
@@ -837,60 +1078,60 @@ var map = {17: false, 40: false, 38: false, 13: false, 91: false, 82: false, 27:
 
 // references
 
-renderCite = function(id){
-        var unRendered = $(id).data("norender");
-        var texcode = unRendered;
-        var Rendered = unRendered.replace(/@[^{]+{(?:[^{}]|{[^{}]*}|{[^{}]*{[^{}]*}[^{}]*})*}/g, function myFunction(x){
-            var title=""
-            var author=""
-            var journal=""
-            var year =""
-            var pages =""
-            var volume = ""
-            var link = ""
-            var re = /{(.*?),/
-            var key = x.match(re)[1]
-            title = extractBibTex(/(title\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            title = toTitleCase(title);
-            author = extractBibTex(/(author\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            journal = extractBibTex(/(journal\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            year = extractBibTex(/(year\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            volume = extractBibTex(/(volume\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            pages = extractBibTex(/(pages\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
-            link = extractBibTex(/(url\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+// renderCite = function(id){
+//         var unRendered = $(id).data("norender");
+//         var texcode = unRendered;
+//         var Rendered = unRendered.replace(/@[^{]+{(?:[^{}]|{[^{}]*}|{[^{}]*{[^{}]*}[^{}]*})*}/g, function myFunction(x){
+//             var title=""
+//             var author=""
+//             var journal=""
+//             var year =""
+//             var pages =""
+//             var volume = ""
+//             var link = ""
+//             var re = /{(.*?),/
+//             var key = x.match(re)[1]
+//             title = extractBibTex(/(title\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             title = toTitleCase(title);
+//             author = extractBibTex(/(author\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             journal = extractBibTex(/(journal\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             year = extractBibTex(/(year\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             volume = extractBibTex(/(volume\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             pages = extractBibTex(/(pages\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
+//             link = extractBibTex(/(url\=\{)([^{}]*|[^{}]*{[^{}]*}[^{}]*)\}/, x);
 
-            if (volume){
-              volume = volume + ":"
-            }
-            if (pages){
-              pages = pages + ", "
-            }
-            if (!(journal)){
-              journal = "Working Paper"
-            }
-            if (link){
-            return "<div class=cite id=cite"+key+"><span class=cite_num></span><a href="+link+">" + author + ". " + title + ". <em>" + journal + "</em>, " + volume + pages + year + ". </a></div>";
-            } else {
-            return "<div class=cite id=cite"+key+"><span class=cite_num></span>" + author + ". " + title + ". <em>" + journal + "</em>, " + volume + pages + year + ". </div>";
-            }
-            });
+//             if (volume){
+//               volume = volume + ":"
+//             }
+//             if (pages){
+//               pages = pages + ", "
+//             }
+//             if (!(journal)){
+//               journal = "Working Paper"
+//             }
+//             if (link){
+//             return "<div class=cite id=cite"+key+"><span class=cite_num></span><a href="+link+">" + author + ". " + title + ". <em>" + journal + "</em>, " + volume + pages + year + ". </a></div>";
+//             } else {
+//             return "<div class=cite id=cite"+key+"><span class=cite_num></span>" + author + ". " + title + ". <em>" + journal + "</em>, " + volume + pages + year + ". </div>";
+//             }
+//             });
 
-        $(id).html(Rendered)
-        $(id).data('texcode', texcode)
-        sortCite(id);
-        cite_nums(); 
-  };
+//         $(id).html(Rendered)
+//         $(id).data('texcode', texcode)
+//         sortCite(id);
+//         cite_nums(); 
+//   };
 
-extractBibTex = function(reg, strg){
-  var key = "";
-  key = strg.match(reg);
-    if (key) {
-      key=key[2].replace(/({|})/g, "");
-    } else {
-      key = "";
-    }
-  return key;
-  };
+// extractBibTex = function(reg, strg){
+//   var key = "";
+//   key = strg.match(reg);
+//     if (key) {
+//       key=key[2].replace(/({|})/g, "");
+//     } else {
+//       key = "";
+//     }
+//   return key;
+//   };
 
 cite_nums = function(){
   var cite = 1

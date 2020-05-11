@@ -6,50 +6,45 @@
   <link type="text/css" rel="stylesheet" href={{ url_for('static', filename='styles/article.css') }} />
   <script type="text/javascript">
         var $art_name_url = '{{name_url}}';
-        var $art_id = '{{art.id}}';
+        var $art_id = {{art.id}}; 
    </script>
-   <script src={{ url_for('static', filename='js/article.js') }} language="Javascript" type="text/javascript"></script>
+   <script src={{ url_for('static', filename='js/bib.js') }} language="Javascript" type="text/javascript"></script>
 {% endblock %}
 {% block title %}Ax.{{art.name}}{% endblock %} 
 {% block content %}
     <div id=content_inner>
     <div id=para_holder>
 
-    <div class=wrap id=xAwrap>
-      <div id=xApara class="para contents_like" data-norender="\section[overview] Overview"></div>
+    <div class=wrap id={{art_id ~ "xAwrap"}}>
+      <div id=Ref_title class="para contents section" data-norender="References"></div>
     </div>
 
      {% for i in para_list %}
-      <div class=wrap id={{i.art_id ~ "x" ~ i.para_order ~ "wrap"}}>
-      <div id={{i.art_id ~ "x" ~ i.para_order ~ "para"}} class="para contents" data-norender="{{i.contents}}"></div>
-      <div id={{i.art_id ~ "x" ~ i.para_order ~ "edit"}} class="parent4focus hidden">
-          <form method='POST' enctype='multipart/form-data' class=local_submit action='/_update/{{name_url}}/{{i.para_order}}'>
-              <textarea autocomplete="off" autofocus="autofocus" name={{i.art_id ~ "x" ~ i.para_order ~ "text"}} id={{i.art_id ~ "x" ~ i.para_order ~ "text"}} class="edit_para">
+      <div class=wrap id={{i.id ~ "wrap"}}>
+      <div id={{i.id ~ "para"}} class="para contents" data-bibtex="{{i.texcode}}">
+            <div class=cite id={{"cite"~i.citekey}}><span class=cite_num></span>
+              {{i.author}}. {{i.year}}. {{i.title}}. <em>{{i.journal}}</em>{{i.volume + i.number + i.pages}}.
+            </div>
+      </div>
+    </div>
+    {% endfor%} 
+
+    <div id={{art.id ~ "x" ~ 0 ~ "edit"}} class="parent4focus hidden">
+          <form method='POST' enctype='multipart/form-data' class=local_submit action='/_update_bib'>
+              <textarea autocomplete="off" autofocus="autofocus" name={{art.id ~ "x0text"}} id=addcite class="edit_para" data-old_citekey="">
               </textarea>
               <div class=button_wrap>
               <div class='fakebutton' id=commit>Commit</div>
               <div class='fakebutton' id=discard>Undo</div>
-              <div class='fakebutton' id=add_below>Add &#x2193</div>
-              {%if i.para_order != 0%}
               <div class='fakebutton deletebutton' id=del>Delete</div>
               <!-- <div class='deleteverify hidden'> Are you sure you would like to delete this section? 
                 <div class='fakebutton' id=delete>Delete</div>
                 <div class='fakebutton' id=undeletebutton>Cancel</div>
                 </div> -->
-              {% endif%}
               </div>
         </form>
-        
-      </div>
     </div>
-        {% endfor%} 
 
-      <div class=wrap id=xRwrap>
-      <div id=xRpara class="para section contents_like" data-norender="References"></div>
-      <div id=xrpara class="para contents_like" data-norender="">
-      </div>
-      </div>
-    
     </div>
     </div>
 

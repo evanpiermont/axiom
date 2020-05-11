@@ -11,15 +11,10 @@ from sqlalchemy.sql import func
 
 from random import randint
 
-from axiom_db_setup import Base, ArtList, ParaList, EqList
+from axiom_db_setup import ArtList, ParaList, EqList, BibList, db, app
  
-filePath = os.getcwd()
-engine = create_engine('sqlite:///'+ filePath + '/axiom.db')
+session = db.session
 
-
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
 
 def urlify(s):
 
@@ -118,7 +113,7 @@ def RenderArticle(art_name_url):
     if art_name_url in h:
         q = session.query(ArtList).filter(ArtList.name_url==art_name_url).one()
         j = session.query(ParaList).join(ArtList).filter(ArtList.id == q.id).filter(ParaList.viewable == True).order_by(ParaList.para_order)
-        k = session.query(ParaList).join(ArtList).filter(ArtList.id == q.id).order_by(ParaList.para_order.desc()).first()
+        #k = session.query(ParaList).join(ArtList).filter(ArtList.id == q.id).order_by(ParaList.para_order.desc()).first()
         
         para_list = []
         para_list.append(0)
@@ -133,6 +128,30 @@ def RenderArticle(art_name_url):
         return render_template('article.html', art=q, para_list = j, name_url=art_name_url)
     else:
         return render_template('home.html')
+
+
+####
+#####
+######
+####### Render's Reference
+######
+#####
+####
+
+@app.route('/bib', methods=['GET', 'POST'])
+def RenderBib():
+
+    q = session.query(ArtList).filter(ArtList.name_url=='bib').one()
+    j = session.query(BibList).order_by(BibList.alph).all()
+    
+    print(j)
+
+    return render_template('bib.html', 
+        art=q, 
+        para_list = j, 
+        name_url='bibliography'
+        )
+
 
 
 ####
@@ -275,33 +294,141 @@ def CommitParaJSON(art_name_url, para_order):
 ####
 #####
 ######
-####### Update References 
+####### Update References FIXXXXX
 ######
 #####
 ####
 
-@app.route('/_update/<art_name_url>/Ref', methods=['POST'])
-def CommitREFS(art_name_url):
-
-    q = session.query(ArtList).filter(ArtList.name_url==art_name_url).one()
-
-    para_identity = str(q.id) + "xR"
+@app.route('/_update_bib', methods=['POST'])
+def CommitREFS():
 
     if request.form['submit'] == 'commit':
 
-        cites= request.form[para_identity + "text"]
+        citekey = request.form['citekey']
+        old_citekey = request.form['old_citekey']
 
-        q.cites = cites
-        session.add(q)
-        session.commit()
+        texcode = request.form['texcode']
+        author = request.form['author']
+        title = request.form['title']
+        journal = request.form['journal']
+        year = request.form['year']
+        pages = request.form['pages']
+        volume = request.form['volume']
+        number = request.form['number']
 
-        return jsonify(para_contents=q.cites, para=para_identity + 'para')
+        if number:
+            number = "(" + number + ")"
+        if volume:
+            volume = ", " + volume
+        else:
+            number = ", no." + number
+        if pages:
+            pages = ", pp. " + pages
+
+        if(not journal):
+            journal = "Mimeo"
+
+        author_list=author.split(" and ")
+        for i in range(len(author_list)):
+            author_list[i] = author_list[i].split(",")[0]
+
+        if len(author_list) > 2:
+            cite_text = author_list[0].split(",")[0] + "et. al. (" + year + ")"
+        else:
+            cite_text = ""
+            for auth in author_list:
+                cite_text += auth.split(",")[0] + " and "
+            cite_text = cite_text[:-5]
+   
+
+
+        print(author_list)
+
+        if old_citekey:
+
+            q2 =  session.query(BibList).filter(BibList.citekey == old_citekey).first()
+
+
+            if q2: #if oldcite has been taken
+
+                q2.citekey = citekey
+                q2.texcode = texcode
+                q2.alph = author + year
+                q2.author = author
+                q2.title = title
+                q2.journal = journal
+                q2.year = year
+                q2.pages = pages
+                q2.volume = volume
+                q2.number = number
+                q2.cite_text = cite_text
+
+                session.add(q2)
+                session.commit()
+
+                return jsonify(json=True, citekey=citekey)
+
+
+        q =  session.query(BibList).filter(BibList.citekey == citekey).first()
+
+
+        if q: #if there is an prior cite key
+
+            q.citekey = citekey
+            q.texcode = texcode
+            q.alph = author + year
+            q.author = author
+            q.title = title
+            q.journal = journal
+            q.year = year
+            q.pages = pages
+            q.volume = volume
+            q.number = number
+            q.cite_text = cite_text
+
+            session.add(q)
+            session.commit()
+
+            return jsonify(json=True, citekey=citekey)
+
+
+
+
+        else:
+
+            print(texcode, len(texcode))
+    
+            new_cite =BibList(
+                citekey = citekey,
+                texcode = texcode,
+                alph = author + year,
+                author = author,
+                title = title,
+                journal = journal,
+                year = year,
+                pages = pages,
+                volume = volume,
+                number = number,
+                cite_text = cite_text,
+                )
+            session.add(new_cite)
+            session.commit()
+    
+            return jsonify(json=True, citekey=citekey)
 
     if request.form['submit'] == 'discard':
 
-        cites=request.form[para_identity + "text"]
+        return jsonify(json=True)
 
-        return jsonify(para_contents=q.cites, para=para_identity + 'para')
+    if request.form['submit'] == 'delete':
+
+        citekey = request.form['citekey']
+        q =  session.query(BibList).filter(BibList.citekey == citekey).delete()
+        session.commit()
+
+
+        return jsonify(json=True)
+
 
 
 @app.route('/_update/<art_name_url>/new', methods=['POST'])
@@ -343,6 +470,53 @@ def getEQJSON():
 
     else:
         return jsonify(eq_text=False)
+
+@app.route('/_getREFS')
+def getREFSJSON():
+
+    keylist = json.loads(request.args.get('keylist'))
+
+    keydict = {}
+    
+    for citekey in keylist:
+        c =  session.query(BibList).filter(BibList.citekey == citekey).first()
+        print(citekey, c)
+        if c:
+            keydict[citekey] = {}
+            keydict[citekey]['texcode'] = c.texcode
+            keydict[citekey]['alph'] = c.alph
+            keydict[citekey]['author'] = c.author
+            keydict[citekey]['title'] = c.title
+            keydict[citekey]['journal'] = c.journal
+            keydict[citekey]['year'] = c.year
+            keydict[citekey]['pages'] = c.pages
+            keydict[citekey]['volume'] = c.volume
+            keydict[citekey]['number'] = c.number
+            keydict[citekey]['cite_text'] = c.cite_text
+        else:   
+            keydict[citekey] = False
+    
+    json_key_list = json.dumps(keydict)
+
+
+    
+    return jsonify(json_key_list=json_key_list)
+
+@app.route('/_getCITETEXT')
+def getCITETEXT():
+
+    current_key = request.args.get('current_key')
+
+    
+    c =  session.query(BibList).filter(BibList.citekey == current_key).first()
+
+    if c:
+        
+        return jsonify(cite_text = c.cite_text, year=c.year)
+    else:
+        return jsonify(False)
+
+
 
 @app.route('/_getOV')
 def getOVJSON():
@@ -392,77 +566,77 @@ def getDL(art_id):
 
     #render_template('axiom.tex')
 
-#     tex = """\documentclass[paper=a4, fontsize=11pt]{article} %% A4 paper and 11pt font size
-# \usepackage[english]{babel} % English language/hyphenation
-# \usepackage{amsmath,amsfonts,amsthm, dsfont} %% Math packages
-# \usepackage{filecontents}
-# \usepackage{hyperref} %% hyperlinks
-# \usepackage{xcolor} %% colors
+    tex = """\\documentclass[paper=a4, fontsize=11pt]{article} %% A4 paper and 11pt font size
+\\usepackage[english]{babel} % English language/hyphenation
+\\usepackage{amsmath,amsfonts,amsthm, dsfont} %% Math packages
+\\usepackage{filecontents}
+\\usepackage{hyperref} %% hyperlinks
+\\usepackage{xcolor} %% colors
 
-# %%%%
-# %%%% COLORS
-# %%%%
-
-
-# \definecolor{linkcolor}{HTML}{ 2D6793}
+%%%%
+%%%% COLORS
+%%%%
 
 
-# \hypersetup{
-# colorlinks=true,
-# linkcolor=linkcolor,
-# urlcolor=linkcolor,
-# citecolor=linkcolor        % color of links to bibliography
-# }
-
-# %%%%
-# %%%% SPACING / NUMBERING / TITLES
-# %%%%
+\\definecolor{linkcolor}{HTML}{ 2D6793}
 
 
-# \usepackage{titlesec}
-# \\titleformat*{\section}{\large\scshape\centering}
-# \\titleformat*{\subsection}{\scshape\centering}
-# \\titleformat*{\subsubsection}{\itshape}
-# \\titleformat*{\paragraph}{\large\\bfseries\centering}
-# \\titleformat*{\subparagraph}{\large\\bfseries\centering}
+\\hypersetup{
+colorlinks=true,
+linkcolor=linkcolor,
+urlcolor=linkcolor,
+citecolor=linkcolor        % color of links to bibliography
+}
 
-# \\titlespacing*\section{0pt}{8pt plus 4pt minus 2pt}{6pt plus 0pt minus 2pt}
+%%%%
+%%%% SPACING / NUMBERING / TITLES
+%%%%
 
-# %%%%
-# %%%% ENVIORNMENTS
-# %%%%
 
-# \\newtheorem{thm}{Theorem}
-# \\newtheorem{prop}[thm]{Proposition}
-# \\newtheorem{cor}{Corollary}[thm]
-# \\newtheorem{lemma}{Lemma}
-# \\newtheorem{ass}{Assumption}
-# \\newtheorem{rmk}{Remark}
-# \\newtheorem*{definition}{Definition}
-# \\newtheorem*{example}{Example}
+\\usepackage{titlesec}
+\\titleformat*{\\section}{\\large\\scshape\\centering}
+\\titleformat*{\\subsection}{\\scshape\\centering}
+\\titleformat*{\\subsubsection}{\\itshape}
+\\titleformat*{\\paragraph}{\\large\\bfseries\\centering}
+\\titleformat*{\\subparagraph}{\\large\\bfseries\\centering}
 
-# %%%%
-# %%%% LOCAL BIB
-# %%%%
+\\titlespacing*\\section{0pt}{8pt plus 4pt minus 2pt}{6pt plus 0pt minus 2pt}
 
-# \\begin{filecontents}{localbib.bib} \n"""
+%%%%
+%%%% ENVIORNMENTS
+%%%%
+
+\\newtheorem{thm}{Theorem}
+\\newtheorem{prop}[thm]{Proposition}
+\\newtheorem{cor}{Corollary}[thm]
+\\newtheorem{lemma}{Lemma}
+\\newtheorem{ass}{Assumption}
+\\newtheorem{rmk}{Remark}
+\\newtheorem*{definition}{Definition}
+\\newtheorem*{example}{Example}
+
+%%%%
+%%%% LOCAL BIB
+%%%%
+
+\\begin{filecontents}{localbib.bib} \n"""
             
-#     tex += q.cites
+    tex += q.cites
 
-#     tex += """\n \\end{filecontents}
+    tex += """\n \\end{filecontents}
 
-# \\usepackage{natbib}
+\\usepackage{natbib}
 
 
-# %%%%
-# %%%% DOCUMENT
-# %%%%
+%%%%
+%%%% DOCUMENT
+%%%%
 
-# \\begin{document}
+\\begin{document}
     
-#         """
+        """
 
-    tex += '''\n \n \n \\title{{ {0}\\thanks{{This document was created via Axiom. 201pWebDev.}} \\date{{{1}}} }}\\maketitle \n \n \section{{Overview}}\label{{sec:overview}} \n \n'''.format(art_id.title(), datetime.datetime.now())
+    tex += '''\n \n \n \\title{{ {0}\\thanks{{This document was created via Axiom:: {{{1}}}.}}  }}\\maketitle \n \n \\section{{Overview}}\\label{{sec:overview}} \n \n'''.format(art_id.title(), datetime.datetime.now())
 
     for para in k:
         cur_para = para.texcode

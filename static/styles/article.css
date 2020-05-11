@@ -13,12 +13,9 @@
 }
 
 
-
 .edit_para{
-  position: absolute;
-  width: 60%;
-  left: 20%;
-  height: 95%;
+  position: relative;
+  width: 100%;
   border: none;
   background: #e7eaed;
 }
@@ -62,7 +59,9 @@ textarea {
     font-size: 120%;
     font-family: Inconsolata;
     padding-top: 2%;
+    padding-bottom: 2%;
     padding-left: 10px;
+    min-height: 50px;
 }
 
 .focused{
@@ -101,7 +100,6 @@ textarea {
 
 #editbutton{
   cursor: pointer;
-  margin-left: 80px;
 }
 
 
@@ -172,84 +170,99 @@ textarea {
 }
 
 .arrow_box {
-	position: fixed;
-	background: lightgray;
-	border-bottom 2px solid black;
-	min-height: 30px;
-	width: 40%;
-	text-align: center;
-	padding: 5px;
-	border-radius: 3px;
-	display: none;
+  position: fixed;
+  background: lightgray;
+  border-bottom 2px solid black;
+  min-height: 30px;
+  width: 40%;
+  text-align: center;
+  padding: 5px;
+  border-radius: 3px;
+  display: none;
 }
+
+
 .arrow_box:after, .arrow_box:before {
-	top: 100%;
-	left: 50%;
-	border: solid transparent;
-	content: " ";
-	height: 0;
-	width: 0;
-	position: absolute;
-	pointer-events: none;
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
 }
 
 .arrow_box:after {
-	border-color: rgba(213, 187, 200, 0);
-	border-top-color: lightgray;
-	border-width: 10px;
-	margin-left: -10px;
+  border-color: rgba(213, 187, 200, 0);
+  border-top-color: lightgray;
+  border-width: 10px;
+  margin-left: -10px;
 
 }
 .arrow_box:before {
-	border-color: rgba(194, 225, 245, 0);
-	border-width: 15px;
-	margin-left: -15px;
+  border-color: rgba(194, 225, 245, 0);
+  border-width: 15px;
+  margin-left: -15px;
 }
 
 .parent4focus{
-	border-top: 3px solid black;
-	background: #e7eaed;
-	position: fixed;
-	bottom: 50px;
-	width: 100%;
-	left: 0;
-	height: 40%;
-	z-index: 999;
+  font-size: 100%;
+  min-height: 50px;
+  margin-top: 10px;
+  padding: 10px;
+  z-index: 999;
 }
 
 .button_wrap{
-	position: absolute;
-	left: 82%;
-	width: 16%;
-	height: 85%;
-	top: 15%;
-	font-family: Inconsolata;
+  position: fixed;
+  left: 85%;
+  width: 15%;
+  height: 10%;
+  bottom: 50%;
+  font-family: Inconsolata;
 
 }
 
 #sidebar{
-	position: fixed;
-	padding-top: 40px;
-	padding-left: 10px;
-	width: 20%;
-	min-height: 10%;
-	top: 5%;
-	display: none;
-	font-size: 25%;
-	font-family: Inconsolata;
+  position: fixed;
+  padding-top: 40px;
+  padding-left: 10px;
+  width: 20%;
+  min-height: 10%;
+  top: 5%;
+  display: none;
+  font-size: 25%;
+  font-family: Inconsolata;
 }
 
 #dl{
-	padding-top: 10%;
-	padding-bottom: 20%;
-	cursor: pointer;
+  padding-top: 10%;
+  padding-bottom: 20%;
+  cursor: pointer;
 }
 
-.thm_num{
-	font-weight: bold;
-	font-style: normal;
+.thm_num, .ex_num{
+  font-weight: bold;
+  font-style: normal;
 }
 
 .thm{
-	font-style: italic; 
+  font-style: italic; 
+  font-style: normal;
+}
+
+.thm{
+  font-style: italic; 
+}
+
+.cite{
+   padding-left: 1.5em;
+   text-indent:-1.5em;
+  font-size: 85%;
+  margin-bottom: 5px;
+}
+
+#xRwrap{
+  display: none;
 }
